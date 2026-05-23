@@ -1,0 +1,1 @@
+curl -X POST --data-binary "@fake_meter.jpg" http://localhost:8000/api/recognize
