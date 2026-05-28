@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Depends
+from fastapi.staticfiles import StaticFiles
 from src.config.logging import setup_logging
 from src.config.settings import settings
 from src.infrastructure.database import get_db
@@ -14,6 +15,9 @@ from src.features.blog.router import router as blog_router
 setup_logging()
 
 app = FastAPI(title=settings.PROJECT_NAME)
+
+# Налаштування статичних файлів
+app.mount(settings.STATIC_URL, StaticFiles(directory=settings.UPLOAD_DIR), name="static")
 
 app.include_router(health_router)
 app.include_router(auth_router)

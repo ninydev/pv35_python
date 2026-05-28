@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, File, UploadFile, Form
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.infrastructure.database import get_db
 from src.features.auth.dependencies import get_current_user, get_optional_current_user
@@ -6,22 +6,28 @@ from src.features.auth.models import User
 from .schemas import PostCreate, PostRead, PostDetailRead
 from .repository import PostRepository
 from .service import PostService
+from src.infrastructure.storage.base import StorageService
+from src.infrastructure.storage.dependencies import get_storage_service
 from src.infrastructure.schemas import PaginationParams, PaginatedResponse
 from typing import Optional
 
 router = APIRouter(prefix="/posts", tags=["Social - Posts"])
 
-async def get_post_service(db: AsyncSession = Depends(get_db)) -> PostService:
+async def get_post_service(
+    db: AsyncSession = Depends(get_db),
+    storage: StorageService = Depends(get_storage_service)
+) -> PostService:
     repository = PostRepository(db)
-    return PostService(repository)
+    return PostService(repository, storage)
 
 @router.post("/", response_model=PostRead, status_code=status.HTTP_201_CREATED)
 async def create_post(
-    post_in: PostCreate,
+    content: str = Form(...),
+    image: Optional[UploadFile] = File(None),
     current_user: User = Depends(get_current_user),
     service: PostService = Depends(get_post_service)
 ):
-    return await service.create_post(post_in, current_user.id)
+    return await service.create_post(content, current_user.id, image)
 
 @router.get("/", response_model=PaginatedResponse[PostRead])
 async def get_posts(

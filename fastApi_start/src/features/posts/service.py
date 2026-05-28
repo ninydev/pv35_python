@@ -2,15 +2,30 @@ from .repository import PostRepository
 from .schemas import PostCreate, PostRead, PostDetailRead
 from .models import Post
 from src.infrastructure.schemas import PaginationParams, PaginatedResponse
+from src.infrastructure.storage.base import StorageService
+from fastapi import UploadFile
 from typing import List, Optional, Any, Dict
 
 class PostService:
-    def __init__(self, repository: PostRepository):
+    def __init__(self, repository: PostRepository, storage: Optional[StorageService] = None):
         self.repository = repository
+        self.storage = storage
 
-    async def create_post(self, post_in: PostCreate, author_id: int) -> Post:
-        post_data = post_in.model_dump()
-        post_data["author_id"] = author_id
+    async def create_post(
+        self, 
+        content: str, 
+        author_id: int, 
+        image: Optional[UploadFile] = None
+    ) -> Post:
+        image_url = None
+        if image and self.storage:
+            image_url = await self.storage.upload_file(image)
+
+        post_data = {
+            "content": content,
+            "author_id": author_id,
+            "image_url": image_url
+        }
         return await self.repository.create_post(post_data)
 
     async def get_posts_paginated(

@@ -23,4 +23,8 @@ class Settings(BaseSettings):
     
     DATABASE_URL: str
 
+    # Storage settings
+    UPLOAD_DIR: str = "uploads"
+    STATIC_URL: str = "/static"
+
 settings = Settings()
