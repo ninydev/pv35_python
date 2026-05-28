@@ -12,7 +12,7 @@
 ### Технології:
 - **FastAPI Security**: Використання `OAuth2PasswordBearer` та `OAuth2PasswordRequestForm`.
 - **PyJWT**: Генерація та валідація JWT токенів.
-- **Passlib**: Надійне хешування паролів.
+- **Bcrypt**: Надійне хешування паролів.
 - **SQLAlchemy 2.0 (Async)**: Робота з базою даних.
 
 ### Ролі:

@@ -8,6 +8,6 @@ pydantic-settings
 alembic
 psutil
 pyjwt
-passlib[bcrypt]
+bcrypt
 python-multipart
 email-validator
