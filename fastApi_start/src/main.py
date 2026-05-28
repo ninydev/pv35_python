@@ -5,12 +5,14 @@ from src.infrastructure.database import get_db
 from sqlalchemy.ext.asyncio import AsyncSession
 from loguru import logger
 from src.features.health.router import router as health_router
+from src.features.auth.router import router as auth_router
 
 setup_logging()
 
 app = FastAPI(title=settings.PROJECT_NAME)
 
 app.include_router(health_router)
+app.include_router(auth_router)
 
 
 @app.get("/")

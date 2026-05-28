@@ -11,6 +11,8 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "Social API"
     LOG_LEVEL: str = "INFO"
     SECRET_KEY: str
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     
     # PostgreSQL settings
     POSTGRES_USER: str

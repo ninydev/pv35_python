@@ -7,3 +7,7 @@ asyncpg
 pydantic-settings
 alembic
 psutil
+pyjwt
+passlib[bcrypt]
+python-multipart
+email-validator
