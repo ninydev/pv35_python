@@ -2,3 +2,8 @@ fastapi
 uvicorn
 loguru
 python-dotenv
+sqlalchemy[asyncio]
+asyncpg
+pydantic-settings
+alembic
+psutil
