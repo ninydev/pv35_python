@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, status
-from fastapi.security import OAuth2PasswordRequestForm
-from .schemas import UserCreate, UserRead, Token
+from .schemas import UserCreate, UserRead, Token, UserLogin
 from .service import AuthService
 from .dependencies import get_auth_service, get_current_user, RoleChecker
 from .models import User
@@ -16,10 +15,10 @@ async def register(
 
 @router.post("/login", response_model=Token)
 async def login(
-    form_data: OAuth2PasswordRequestForm = Depends(),
+    login_data: UserLogin,
     auth_service: AuthService = Depends(get_auth_service)
 ):
-    user = await auth_service.authenticate_user(form_data.username, form_data.password)
+    user = await auth_service.authenticate_user(login_data.email, login_data.password)
     return auth_service.create_token(user)
 
 @router.get("/me", response_model=UserRead)

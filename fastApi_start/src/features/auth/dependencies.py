@@ -1,5 +1,5 @@
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.infrastructure.database import get_db
 from .repository import AuthRepository
@@ -8,14 +8,14 @@ from .utils import decode_access_token
 from .models import User
 from typing import List
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
+http_bearer = HTTPBearer()
 
 async def get_auth_service(db: AsyncSession = Depends(get_db)) -> AuthService:
     repository = AuthRepository(db)
     return AuthService(repository)
 
 async def get_current_user(
-    token: str = Depends(oauth2_scheme),
+    auth: HTTPAuthorizationCredentials = Depends(http_bearer),
     auth_service: AuthService = Depends(get_auth_service)
 ) -> User:
     credentials_exception = HTTPException(
@@ -24,6 +24,7 @@ async def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
     
+    token = auth.credentials
     payload = decode_access_token(token)
     if payload is None:
         raise credentials_exception
