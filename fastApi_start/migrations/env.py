@@ -14,8 +14,11 @@ sys.path.insert(0, os.path.realpath(os.path.join(os.path.dirname(__file__), '..'
 
 from src.config.settings import settings
 from src.infrastructure.base_model import Base
-# Импортируем модели для регистрации в метаданных
+# Імпортуємо моделі для реєстрації в метаданих
 from src.features.auth.models import User, Role
+from src.features.posts.models import Post
+from src.features.comments.models import Comment
+from src.features.likes.models import Like
 
 # this is the Alembic Config object, which provides access to the values within the .ini file in use.
 config = context.config

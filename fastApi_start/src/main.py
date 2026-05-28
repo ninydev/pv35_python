@@ -6,6 +6,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from loguru import logger
 from src.features.health.router import router as health_router
 from src.features.auth.router import router as auth_router
+from src.features.posts.router import router as posts_router
+from src.features.comments.router import router as comments_router
+from src.features.likes.router import router as likes_router
+from src.features.blog.router import router as blog_router
 
 setup_logging()
 
@@ -13,6 +17,10 @@ app = FastAPI(title=settings.PROJECT_NAME)
 
 app.include_router(health_router)
 app.include_router(auth_router)
+app.include_router(posts_router)
+app.include_router(comments_router)
+app.include_router(likes_router)
+app.include_router(blog_router)
 
 
 @app.get("/")
