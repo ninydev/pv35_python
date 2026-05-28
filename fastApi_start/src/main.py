@@ -11,10 +11,19 @@ from src.features.posts.router import router as posts_router
 from src.features.comments.router import router as comments_router
 from src.features.likes.router import router as likes_router
 from src.features.blog.router import router as blog_router
+from src.features.sse.router import router as sse_router
+from src.features.websocket.router import router as ws_router
+from strawberry.fastapi import GraphQLRouter
+from src.features.graphql_api.schema import schema
 
 setup_logging()
 
 app = FastAPI(title=settings.PROJECT_NAME)
+
+async def get_context(db: AsyncSession = Depends(get_db)):
+    return {"db": db}
+
+graphql_app = GraphQLRouter(schema, context_getter=get_context)
 
 # Налаштування статичних файлів
 app.mount(settings.STATIC_URL, StaticFiles(directory=settings.UPLOAD_DIR), name="static")
@@ -25,15 +34,6 @@ app.include_router(posts_router)
 app.include_router(comments_router)
 app.include_router(likes_router)
 app.include_router(blog_router)
-
-
-@app.get("/")
-async def root(db: AsyncSession = Depends(get_db)):
-    logger.info("Root endpoint called")
-    return {"message": "Hello World", "project_name": settings.PROJECT_NAME}
-
-
-@app.get("/hello/{name}")
-async def say_hello(name: str):
-    logger.info(f"Hello endpoint called with name: {name}")
-    return {"message": f"Hello {name}"}
+app.include_router(sse_router)
+app.include_router(ws_router)
+app.include_router(graphql_app, prefix="/graphql")

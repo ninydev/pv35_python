@@ -14,8 +14,16 @@ class CommentRepository:
         await self.db.commit()
         await self.db.refresh(new_comment)
         
-        # Завантажимо автора для відповіді
-        query = select(Comment).where(Comment.id == new_comment.id).options(selectinload(Comment.author))
+        # Завантажимо автора та інформацію про пост для сповіщень
+        from src.features.posts.models import Post
+        query = (
+            select(Comment)
+            .where(Comment.id == new_comment.id)
+            .options(
+                selectinload(Comment.author),
+                selectinload(Comment.post)
+            )
+        )
         result = await self.db.execute(query)
         return result.scalar_one()
 

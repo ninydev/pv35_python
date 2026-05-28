@@ -11,3 +11,5 @@ pyjwt
 bcrypt
 python-multipart
 email-validator
+strawberry-graphql[fastapi]
+sse-starlette

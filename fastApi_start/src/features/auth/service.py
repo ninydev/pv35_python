@@ -3,6 +3,7 @@ from .repository import AuthRepository
 from .schemas import UserCreate, Token
 from .utils import hash_password, verify_password, create_access_token
 from .models import User
+from src.features.sse.connection_manager import sse_manager
 
 class AuthService:
     def __init__(self, repository: AuthRepository):
@@ -28,7 +29,16 @@ class AuthService:
             "hashed_password": hash_password(user_in.password)
         }
         
-        return await self.repository.create_user(user_data, [role])
+        new_user = await self.repository.create_user(user_data, [role])
+        
+        # Сповіщення всіх про нового користувача
+        await sse_manager.broadcast({
+            "type": "new_user",
+            "message": f"Новий користувач {new_user.email} приєднався до нас!",
+            "user_id": new_user.id
+        })
+        
+        return new_user
 
     async def authenticate_user(self, email: str, password: str) -> User:
         user = await self.repository.get_user_by_email(email)
