@@ -132,3 +132,11 @@ AUTH_USER_MODEL = 'auth.User'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+
+try:
+    from .settings_sicret import TELEGRAM_BOT_TOKEN, TELEGRAM_GROUP_ID
+except ImportError:
+    # Заглушка на случай, если на сервере файла не будет, чтобы проект не падал
+    TELEGRAM_BOT_TOKEN = None
+    TELEGRAM_GROUP_ID = None
