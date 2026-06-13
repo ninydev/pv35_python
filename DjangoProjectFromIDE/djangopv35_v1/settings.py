@@ -12,8 +12,6 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 
-import accounts
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -134,10 +132,28 @@ AUTH_USER_MODEL = 'auth.User'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# --- Default Settings ---
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.ukr.net'
+EMAIL_PORT = 465
+EMAIL_USE_SSL = True
+EMAIL_USE_TLS = False
+EMAIL_HOST_USER = None
+EMAIL_HOST_PASSWORD = None
 
+TELEGRAM_BOT_TOKEN = None
+TELEGRAM_GROUP_ID = None
+
+# --- Import secrets to override defaults ---
 try:
-    from .settings_sicret import TELEGRAM_BOT_TOKEN, TELEGRAM_GROUP_ID
+    from .settings_sicret import *
 except ImportError:
-    # Заглушка на случай, если на сервере файла не будет, чтобы проект не падал
-    TELEGRAM_BOT_TOKEN = None
-    TELEGRAM_GROUP_ID = None
+    pass
+
+# --- Final Email Configuration ---
+# To prevent "ValueError: EMAIL_USE_TLS/EMAIL_USE_SSL are mutually exclusive",
+# we ensure only one is True. We prioritize SSL as it's needed for port 465.
+if EMAIL_USE_SSL:
+    EMAIL_USE_TLS = False
+elif EMAIL_USE_TLS:
+    EMAIL_USE_SSL = False
