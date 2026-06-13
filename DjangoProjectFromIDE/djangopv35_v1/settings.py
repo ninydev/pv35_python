@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'pages',
     'accounts',
     'news',
-    'feedback'
+    'feedback',
+    'graphene_django'
 ]
 
 MIDDLEWARE = [
@@ -157,3 +158,7 @@ if EMAIL_USE_SSL:
     EMAIL_USE_TLS = False
 elif EMAIL_USE_TLS:
     EMAIL_USE_SSL = False
+
+GRAPHENE = {
+    'SCHEMA': 'djangopv35_v1.schema.schema'
+}
