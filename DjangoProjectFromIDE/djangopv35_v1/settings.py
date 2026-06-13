@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'pv35.apps.Pv35Config',
     'pages',
     'accounts',
-    'news'
+    'news',
+    'feedback'
 ]
 
 MIDDLEWARE = [
