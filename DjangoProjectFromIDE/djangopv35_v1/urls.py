@@ -22,6 +22,7 @@ from django.conf.urls.static import static
 from django.urls import path, include
 from graphene_django.views import GraphQLView
 from django.views.decorators.csrf import csrf_exempt
+import django_eventstream
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -29,6 +30,7 @@ urlpatterns = [
     path('news/', include('news.urls')),
     path('feedback/', include('feedback.urls')),
     path("graphql", csrf_exempt(GraphQLView.as_view(graphiql=True))),
+    path('events/', include(django_eventstream.urls), {'channels': ['news-feed']}),
 ]
 
 if settings.DEBUG:

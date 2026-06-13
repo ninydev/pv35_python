@@ -2,6 +2,9 @@
 
 {% block content %}
 
+<!-- SSE Notification Area -->
+<div id="sse-notifications" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
+    <hr>
 
 <div class="row">
     {% for news in news_list %}
@@ -12,5 +15,51 @@
         </div>
     {% endfor %}
 </div>
+
+<!-- SSE JavaScript Connection -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Подключаемся к SSE-эндпоинту
+        var eventSource = new EventSource('/events/');
+
+        eventSource.onmessage = function(event) {
+            console.log("Отримано повідомлення: ", event.data);
+            try {
+                var data = JSON.parse(event.data);
+                alert(event.data)
+
+                // Создаем элемент уведомления
+                var notification = document.createElement("div");
+                notification.className = "alert alert-info alert-dismissible fade show";
+                notification.style.marginBottom = "10px";
+                notification.style.boxShadow = "0 4px 8px rgba(0,0,0,0.1)";
+
+                notification.innerHTML = `
+                    <strong>Увага!</strong> ` + data.text + `
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                `;
+
+                // Добавляем уведомление на страницу
+                var container = document.getElementById("sse-notifications");
+                container.appendChild(notification);
+
+                // Автоматически скрываем уведомление через 5 секунд
+                setTimeout(function() {
+                    notification.remove();
+                }, 5000);
+
+            } catch (e) {
+                console.error("Помилка при обробці даних:", e);
+                alert('Error ')
+            }
+        };
+
+        eventSource.onerror = function(event) {
+            console.error("EventSource failed:", event);
+            alert('Connection error. Please refresh the page.');
+            // Обработка ошибок, возможно переподключение
+        };
+    });
+</script>
 
 {% endblock %}

@@ -1,6 +1,6 @@
 # Django GraphQL Project
 
-This project demonstrates how to integrate GraphQL into a Django application using `graphene-django`.
+This project demonstrates how to integrate GraphQL into a Django application using `graphene-django`, as well as setting up Server-Sent Events (SSE) for real-time notifications.
 
 ## How to add GraphQL to Django
 
@@ -76,3 +76,74 @@ query {
   }
 }
 ```
+
+## How to add Server-Sent Events (SSE)
+
+1. **Install required packages:**
+   ```bash
+   pip install django-eventstream channels daphne
+   ```
+
+2. **Update `settings.py`:**
+   Add the following to `INSTALLED_APPS`:
+   ```python
+   INSTALLED_APPS = [
+       'daphne', # Must be at the top or above django.contrib.staticfiles
+       # ...
+       'django_eventstream',
+   ]
+   ```
+   Configure the ASGI application:
+   ```python
+   ASGI_APPLICATION = 'djangopv35_v1.asgi.application'
+   ```
+
+3. **Configure ASGI (`asgi.py`):**
+   When using modern versions of Django (3.0+) and Daphne, `django-eventstream` works seamlessly with standard Django URL routing. You can leave your `asgi.py` as default:
+   ```python
+   import os
+   from django.core.asgi import get_asgi_application
+
+   os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'djangopv35_v1.settings')
+
+   application = get_asgi_application()
+   ```
+
+4. **Update `urls.py`:**
+   Add the endpoint for the EventStream directly to your main `urls.py`:
+   ```python
+   import django_eventstream
+
+   urlpatterns = [
+       # ...
+       path('events/', include(django_eventstream.urls), {'channels': ['news-feed']}),
+   ]
+   ```
+
+5. **Send Events (Signals):**
+   Use Django signals to send an event when a model is created. For example, in `news/signals.py`:
+   ```python
+   from django.db.models.signals import post_save
+   from django.dispatch import receiver
+   from django_eventstream import send_event
+   from .models import News
+
+   @receiver(post_save, sender=News)
+   def send_news_update(sender, instance, created, **kwargs):
+       if created:
+           send_event('news-feed', 'message', {'text': f'Нова новина: {instance.title}'})
+   ```
+
+6. **Listen for Events on the Frontend (JavaScript):**
+   In your HTML template, use the built-in `EventSource` API:
+   ```javascript
+   var eventSource = new EventSource('/events/');
+
+   eventSource.onmessage = function(event) {
+       var data = JSON.parse(event.data);
+       console.log("Новое событие:", data.text);
+       // Отобразите уведомление пользователю
+   };
+   ```
+
+To test SSE, run your server using Daphne (`python manage.py runserver`), open the news list page, and create a new news article in another tab or via the admin panel. You will receive a real-time notification on the opened page without refreshing it!

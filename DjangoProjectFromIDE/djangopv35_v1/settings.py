@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'accounts',
     'news',
     'feedback',
-    'graphene_django'
+    'graphene_django',
+    'django_eventstream'
 ]
 
 MIDDLEWARE = [
@@ -74,6 +75,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'djangopv35_v1.wsgi.application'
+ASGI_APPLICATION = 'djangopv35_v1.asgi.application'
 
 
 # Database
